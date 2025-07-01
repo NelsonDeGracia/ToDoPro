@@ -1,5 +1,4 @@
-// app/(tabs)/stats.tsx
-
+// Importación de librerías necesarias
 import React, { useContext, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
@@ -8,42 +7,47 @@ import {
   Text,
   View
 } from 'react-native';
+
+// Importación de constantes de estilo personalizadas
 import { COLORS, SPACING } from '../../constants/Colors';
+
+// Importación del contexto que contiene las tareas
 import { TaskContext } from '../../context/TaskContext';
 
 export default function StatsScreen() {
-  // Contexto de tareas
+  // Obtenemos las tareas desde el contexto
   const { tasks } = useContext(TaskContext);
 
-  // Estados para datos remotos
+  // Estados para almacenar datos de la API
   const [remoteItems, setRemoteItems] = useState<{ id: number; title: string }[]>([]);
-  const [loadingRemote, setLoadingRemote] = useState(true);
-  const [errorRemote, setErrorRemote] = useState<string | null>(null);
+  const [loadingRemote, setLoadingRemote] = useState(true);           // Estado de carga
+  const [errorRemote, setErrorRemote] = useState<string | null>(null); // Estado de error
 
-  // Petición a API al montar
+  // Hook useEffect para hacer la petición al montar el componente
   useEffect(() => {
-    fetch('https://jsonplaceholder.typicode.com/todos?_limit=5')
+    fetch('https://jsonplaceholder.typicode.com/todos?_limit=5') // Petición a API de prueba
       .then(res => {
-        if (!res.ok) throw new Error(`Código ${res.status}`);
+        if (!res.ok) throw new Error(`Código ${res.status}`); // Manejo de errores HTTP
         return res.json();
       })
       .then(data => {
+        // Formateamos los datos obtenidos
         const items = (data as any[]).map(item => ({
           id: item.id,
           title: item.title,
         }));
-        setRemoteItems(items);
+        setRemoteItems(items); // Guardamos en el estado
       })
-      .catch(err => setErrorRemote(err.message))
-      .finally(() => setLoadingRemote(false));
+      .catch(err => setErrorRemote(err.message)) // Si hay error, lo almacenamos
+      .finally(() => setLoadingRemote(false));   // Terminamos la carga
   }, []);
 
-  // Estadísticas locales
+  // Cálculo de estadísticas locales
   const total     = tasks.length;
   const completed = tasks.filter(t => t.completed).length;
   const pending   = total - completed;
 
-  // Render condicional
+  // Si los datos remotos están cargando, mostramos spinner
   if (loadingRemote) {
     return (
       <View style={styles.center}>
@@ -52,6 +56,7 @@ export default function StatsScreen() {
     );
   }
 
+  // Si hubo error al cargar los datos remotos, se muestra mensaje
   if (errorRemote) {
     return (
       <View style={styles.center}>
@@ -60,8 +65,10 @@ export default function StatsScreen() {
     );
   }
 
+  // Render principal cuando ya hay datos cargados
   return (
     <ScrollView contentContainerStyle={styles.container}>
+      {/* Sección de datos remotos */}
       <Text style={styles.sectionTitle}>Datos remotos (JSONPlaceholder):</Text>
       {remoteItems.map(item => (
         <Text key={item.id} style={styles.remoteItem}>
@@ -69,8 +76,10 @@ export default function StatsScreen() {
         </Text>
       ))}
 
+      {/* Separador visual */}
       <View style={styles.separator} />
 
+      {/* Sección de estadísticas locales */}
       <Text style={styles.sectionTitle}>Estadísticas locales:</Text>
       <Text style={styles.statText}>Total de tareas:   {total}</Text>
       <Text style={styles.statText}>Completadas:      {completed}</Text>
@@ -79,6 +88,7 @@ export default function StatsScreen() {
   );
 }
 
+// Estilos para los componentes de la pantalla
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
@@ -115,20 +125,3 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
 });
-// Este código define una pantalla de estadísticas en una aplicación React Native utilizando Expo Router.
-// Muestra estadísticas de tareas locales y datos remotos obtenidos de una API (JSONPlaceholder).
-// Utiliza el contexto de tareas para acceder a las tareas locales y muestra un indicador de carga mientras se obtienen los datos remotos.
-// Si ocurre un error al cargar los datos remotos, muestra un mensaje de error.
-// El estilo se define utilizando StyleSheet de React Native para mantener la consistencia visual en la aplicación.
-// El uso de ScrollView permite que el contenido sea desplazable, lo cual es útil para pantallas con mucho contenido.
-// Las estadísticas locales incluyen el total de tareas, las completadas y las pendientes.
-// Los datos remotos se muestran como una lista de títulos obtenidos de la API, con un límite de 5 elementos.
-// El uso de useContext permite acceder al contexto de tareas y sus funciones, como obtener la lista de tareas.
-// Este enfoque modular y basado en contexto facilita la gestión del estado de las tareas y la visualización de estadísticas en la aplicación.
-// Además, el uso de estados locales permite manejar la carga y los errores de manera eficiente.
-// El uso de constantes para colores y espaciados ayuda a mantener la consistencia visual en toda la aplicación.
-// Las funciones de estilo permiten definir un diseño limpio y organizado, mejorando la experiencia del usuario al interactuar con la aplicación.
-// La pantalla está diseñada para ser responsiva y fácil de usar, con un enfoque en la usabilidad y la experiencia del usuario.
-// El uso de Text y View permite mostrar información de manera clara y estructurada, mientras que el uso de ActivityIndicator proporciona una retroalimentación visual durante la carga de datos.
-// Este enfoque modular y basado en contexto facilita la gestión del estado de las tareas y la visualización de estadísticas en la aplicación.
-// La pantalla está diseñada para ser responsiva y fácil de usar, con un enfoque en la usabilidad y la experiencia del usuario.
