@@ -1,3 +1,4 @@
+verificar la ultima version de index
 import { MaterialIcons } from '@expo/vector-icons';
 // Iconos de Material Design para usar en botones
 
