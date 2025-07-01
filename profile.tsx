@@ -1,46 +1,54 @@
-// app/(tabs)/profile.tsx
-// app/(tabs)/profile.tsx
-
+// Importación de dependencias necesarias desde React y React Native
 import React, { useContext, useState } from 'react';
 import {
-  Alert, Button, ScrollView, StyleSheet, Switch, Text, TextInput, View
+  Alert, Button, ScrollView, StyleSheet, Switch,
+  Text, TextInput, View
 } from 'react-native';
+
+// Importación del contexto que maneja las tareas
 import { TaskContext } from '../../context/TaskContext';
 
 export default function ProfileScreen() {
-  const [isEditing, setIsEditing] = useState(false);
-  const [name, setName] = useState('Abelardo Arrocha');
-  const [email, setEmail] = useState('ejemplo@correo.com');
-  const [age, setAge] = useState('21');
-  const [isDarkMode, setIsDarkMode] = useState(false);
-  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+  // Estados locales para controlar edición del perfil y configuraciones
+  const [isEditing, setIsEditing] = useState(false);  // Modo de edición activado o no
+  const [name, setName] = useState('Abelardo Arrocha'); // Nombre del usuario
+  const [email, setEmail] = useState('ejemplo@correo.com'); // Correo electrónico
+  const [age, setAge] = useState('21'); // Edad
+  const [isDarkMode, setIsDarkMode] = useState(false); // Activación de modo oscuro
+  const [notificationsEnabled, setNotificationsEnabled] = useState(true); // Notificaciones activadas
 
-  // Ya no necesitamos clearAllTasks aquí
+  // Obtenemos las tareas desde el contexto
   const { tasks } = useContext(TaskContext);
 
+  // Función que valida y guarda los cambios en el perfil
   const handleSaveProfile = () => {
     if (!name.trim() || !email.trim() || !age.trim()) {
       Alert.alert('Error', 'Todos los campos son obligatorios.');
       return;
     }
-    setIsEditing(false);
+    setIsEditing(false); // Sale del modo edición si los datos son válidos
   };
 
   return (
     <ScrollView contentContainerStyle={[
       styles.container,
-      isDarkMode && styles.darkBackground
+      isDarkMode && styles.darkBackground // Cambia fondo si modo oscuro está activado
     ]}>
+      {/* Título */}
       <Text style={[styles.heading, isDarkMode && styles.darkText]}>
         ⚙️ Perfil y Configuración
       </Text>
 
+      {/* Sección de edición del perfil si isEditing es true */}
       {isEditing ? (
         <>
+          {/* Campo: Nombre */}
           <View style={styles.formRow}>
             <Text style={styles.label}>Nombre:</Text>
             <TextInput style={styles.input} value={name} onChangeText={setName} />
           </View>
+
+          {/* Campo: Correo */}
           <View style={styles.formRow}>
             <Text style={styles.label}>Correo:</Text>
             <TextInput
@@ -51,6 +59,8 @@ export default function ProfileScreen() {
               autoCapitalize="none"
             />
           </View>
+
+          {/* Campo: Edad */}
           <View style={styles.formRow}>
             <Text style={styles.label}>Edad:</Text>
             <TextInput
@@ -60,6 +70,8 @@ export default function ProfileScreen() {
               keyboardType="numeric"
             />
           </View>
+
+          {/* Botones para guardar o cancelar edición */}
           <View style={styles.buttonRow}>
             <Button title="Guardar" onPress={handleSaveProfile} />
             <Button title="Cancelar" color="#777" onPress={() => setIsEditing(false)} />
@@ -67,37 +79,45 @@ export default function ProfileScreen() {
         </>
       ) : (
         <>
+          {/* Vista del perfil sin edición */}
           <View style={styles.infoSection}>
             <Text style={styles.infoLabel}>Nombre:</Text>
             <Text style={[styles.infoText, isDarkMode && styles.darkText]}>
               {name}
             </Text>
           </View>
+
           <View style={styles.infoSection}>
             <Text style={styles.infoLabel}>Correo:</Text>
             <Text style={[styles.infoText, isDarkMode && styles.darkText]}>
               {email}
             </Text>
           </View>
+
           <View style={styles.infoSection}>
             <Text style={styles.infoLabel}>Edad:</Text>
             <Text style={[styles.infoText, isDarkMode && styles.darkText]}>
               {age} años
             </Text>
           </View>
+
+          {/* Botón para activar modo edición */}
           <View style={styles.editButton}>
             <Button title="✏️ Editar perfil" onPress={() => setIsEditing(true)} />
           </View>
         </>
       )}
 
+      {/* Separador visual */}
       <View style={styles.separator} />
 
-      {/* Ajustes */}
+      {/* Ajuste: Modo oscuro */}
       <View style={styles.section}>
         <Text style={[styles.label, isDarkMode && styles.darkText]}>Modo oscuro</Text>
         <Switch value={isDarkMode} onValueChange={() => setIsDarkMode(v => !v)} />
       </View>
+
+      {/* Ajuste: Notificaciones */}
       <View style={styles.section}>
         <Text style={[styles.label, isDarkMode && styles.darkText]}>Notificaciones</Text>
         <Switch
@@ -106,6 +126,7 @@ export default function ProfileScreen() {
         />
       </View>
 
+      {/* Pie de página con información de tareas */}
       <View style={styles.footer}>
         <Text style={[styles.subheading, isDarkMode && styles.darkText]}>
           Tienes {tasks.length} tareas almacenadas
@@ -115,34 +136,79 @@ export default function ProfileScreen() {
   );
 }
 
+// Estilos para la pantalla y elementos
 const styles = StyleSheet.create({
-  container: { flexGrow:1, padding:16, backgroundColor:'#fff' },
-  darkBackground:{ backgroundColor:'#333' },
-  heading:{ fontSize:24, fontWeight:'bold', marginBottom:24, color:'#1E88E5', textAlign:'center' },
-  darkText:{ color:'#fff' },
-  infoSection:{ flexDirection:'row', marginBottom:12 },
-  infoLabel:{ fontWeight:'bold', width:80, fontSize:16, color:'#333' },
-  infoText:{ fontSize:16, color:'#555' },
-  editButton:{ marginVertical:12, alignItems:'flex-start' },
-  formRow:{ marginBottom:12 },
-  label:{ fontSize:16, color:'#333' },
-  input:{ borderWidth:1, borderColor:'#aaa', padding:8, marginTop:4, borderRadius:4 },
-  buttonRow:{ flexDirection:'row', justifyContent:'space-between', marginBottom:16 },
-  separator:{ height:1, backgroundColor:'#ccc', marginVertical:16 },
-  section:{ flexDirection:'row', justifyContent:'space-between', alignItems:'center', marginVertical:12 },
-  footer:{ marginTop:24, alignItems:'center' },
-  subheading:{ fontSize:16 },
+  container: {
+    flexGrow: 1,
+    padding: 16,
+    backgroundColor: '#fff'
+  },
+  darkBackground: {
+    backgroundColor: '#333'
+  },
+  heading: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 24,
+    color: '#1E88E5',
+    textAlign: 'center'
+  },
+  darkText: {
+    color: '#fff'
+  },
+  infoSection: {
+    flexDirection: 'row',
+    marginBottom: 12
+  },
+  infoLabel: {
+    fontWeight: 'bold',
+    width: 80,
+    fontSize: 16,
+    color: '#333'
+  },
+  infoText: {
+    fontSize: 16,
+    color: '#555'
+  },
+  editButton: {
+    marginVertical: 12,
+    alignItems: 'flex-start'
+  },
+  formRow: {
+    marginBottom: 12
+  },
+  label: {
+    fontSize: 16,
+    color: '#333'
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#aaa',
+    padding: 8,
+    marginTop: 4,
+    borderRadius: 4
+  },
+  buttonRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 16
+  },
+  separator: {
+    height: 1,
+    backgroundColor: '#ccc',
+    marginVertical: 16
+  },
+  section: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginVertical: 12
+  },
+  footer: {
+    marginTop: 24,
+    alignItems: 'center'
+  },
+  subheading: {
+    fontSize: 16
+  }
 });
-
-// Este código define una pantalla de perfil y configuración en una aplicación React Native utilizando Expo Router.
-// Permite al usuario ver y editar su perfil, así como ajustar configuraciones como el modo oscuro y las notificaciones.
-// Utiliza el contexto de tareas para mostrar la cantidad de tareas almacenadas y permite limpiar todas las tareas con confirmación previa.
-// El estilo se define utilizando StyleSheet de React Native para mantener la consistencia visual en la aplicación.
-// El uso de ScrollView permite que el contenido sea desplazable, lo cual es útil para pantallas con mucho contenido.
-// El uso de Switch permite al usuario activar o desactivar opciones de configuración de manera intuitiva.
-// El uso de Alert permite mostrar mensajes de confirmación antes de realizar acciones destructivas como eliminar todas las tareas.
-// Este enfoque modular y basado en contexto facilita la gestión del estado de las tareas y la navegación entre pantallas en la aplicación.
-// Además, el uso de estados locales permite manejar la edición del perfil y las configuraciones de manera eficiente.
-// La pantalla está diseñada para ser responsiva y fácil de usar, con un enfoque en la usabilidad y la experiencia del usuario.
-// El uso de TextInput permite al usuario ingresar y editar su información de perfil, mientras que
-// los botones permiten guardar cambios o cancelar la edición de manera sencilla. 
