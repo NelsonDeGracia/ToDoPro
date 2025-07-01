@@ -8,24 +8,35 @@
 // Este enfoque modular y basado en contexto facilita la gestión del estado de las tareas y la navegación entre pantallas en la aplicación.
 
 import { useRouter } from 'expo-router';
+// Hook para navegar entre pantallas
+
 import React, { useContext, useState } from 'react';
+// React y hooks para estado local y contexto
+
 import { Alert, Button, StyleSheet, Text, TextInput, View } from 'react-native';
+// Componentes básicos de la interfaz en React Native
+
 import { TaskContext } from '../context/TaskContext';
+// Importa el contexto de tareas
 
 export default function AddTaskScreen() {
-  const { addTask } = useContext(TaskContext);
-  const router = useRouter();
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
+  const { addTask } = useContext(TaskContext); // Accede a la función para agregar tarea
+  const router = useRouter(); // Para regresar a la pantalla anterior
 
+  const [title, setTitle] = useState(''); // Estado para el título
+  const [description, setDescription] = useState(''); // Estado para la descripción
+
+  // Función que se ejecuta al guardar
   const onSave = () => {
     if (!title.trim()) return Alert.alert('Error','El título es obligatorio');
+    // Agrega la nueva tarea al contexto
     addTask({ title: title.trim(), description: description.trim(), completed: false });
-    router.back();
+    router.back(); // Vuelve a la pantalla anterior
   };
 
   return (
     <View style={styles.container}>
+      {/* Campo para el título */}
       <Text style={styles.label}>Título:</Text>
       <TextInput
         value={title}
@@ -33,6 +44,8 @@ export default function AddTaskScreen() {
         style={styles.input}
         placeholder="Escribe un título"
       />
+
+      {/* Campo para la descripción */}
       <Text style={styles.label}>Descripción:</Text>
       <TextInput
         value={description}
@@ -41,11 +54,14 @@ export default function AddTaskScreen() {
         placeholder="Detalles de la tarea"
         multiline
       />
+
+      {/* Botón para guardar tarea */}
       <Button title="Guardar tarea" onPress={onSave} />
     </View>
   );
 }
 
+// Estilos para los componentes
 const styles = StyleSheet.create({
   container: { flex:1, padding:16 },
   label: { marginBottom:4, fontWeight:'bold' },
@@ -55,3 +71,4 @@ const styles = StyleSheet.create({
   },
   textarea: { height:80, textAlignVertical:'top' },
 });
+
