@@ -1,6 +1,12 @@
 import { MaterialIcons } from '@expo/vector-icons';
+// Iconos de Material Design para usar en botones
+
 import { useRouter } from 'expo-router';
+// Hook para navegación entre pantallas
+
 import React, { useContext } from 'react';
+// React y hook para acceder al contexto
+
 import {
   Alert,
   FlatList,
@@ -11,18 +17,23 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
+// Componentes principales de interfaz en React Native
+
 import { TaskContext } from '../../context/TaskContext';
+// Importa el contexto de tareas
 
 const logo = require('../../assets/images/react-logo.png');
+// Carga imagen local para el logo
 
 export default function TaskListScreen() {
-  const router = useRouter();
-  const { tasks, toggleCompleted, deleteTask } = useContext(TaskContext);
+  const router = useRouter(); // Navegación
+  const { tasks, toggleCompleted, deleteTask } = useContext(TaskContext); // Acceso a tareas y acciones
 
+  // Manejador para eliminar tarea
   const handleDelete = (id: string) => {
     console.log('🔵 [Index] handleDelete llamado con id:', id);
 
-    // Si estamos en web, usamos window.confirm
+    // Confirmación distinta para web
     if (Platform.OS === 'web') {
       const ok = window.confirm('¿Seguro que deseas eliminar esta tarea?');
       console.log('🔘 [Index:web] confirm result:', ok);
@@ -33,7 +44,7 @@ export default function TaskListScreen() {
       return;
     }
 
-    // En native, mantenemos Alert.alert
+    // Confirmación para móvil (nativo)
     Alert.alert(
       'Eliminar tarea',
       '¿Seguro que deseas eliminar esta tarea?',
@@ -54,8 +65,10 @@ export default function TaskListScreen() {
 
   return (
     <View style={styles.container}>
+      {/* Logo de la aplicación */}
       <Image source={logo} style={styles.logo} resizeMode="contain" />
 
+      {/* Botón para navegar a pantalla de agregar tarea */}
       <TouchableOpacity
         style={styles.addButton}
         onPress={() => router.push('/add')}
@@ -63,11 +76,13 @@ export default function TaskListScreen() {
         <Text style={styles.addButtonText}>➕ Agregar tarea</Text>
       </TouchableOpacity>
 
+      {/* Lista de tareas */}
       <FlatList
         data={tasks}
         keyExtractor={t => t.id}
         renderItem={({ item }) => (
           <View style={styles.taskRow}>
+            {/* Título de la tarea - clic para ver detalles */}
             <TouchableOpacity
               style={styles.titleContainer}
               onPress={() => router.push(`/detail/${item.id}`)}
@@ -82,6 +97,7 @@ export default function TaskListScreen() {
               </Text>
             </TouchableOpacity>
 
+            {/* Iconos de acciones (check y eliminar) */}
             <View style={styles.iconsContainer}>
               <TouchableOpacity onPress={() => toggleCompleted(item.id)}>
                 <Text style={styles.checkbox}>
@@ -102,6 +118,7 @@ export default function TaskListScreen() {
   );
 }
 
+// Estilos para los componentes de la pantalla
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 16 },
   logo: { width: 120, height: 120, alignSelf: 'center', marginBottom: 16 },
