@@ -6,7 +6,7 @@
 
 export const COLORS = {
   primary:    '#1E88E5', //Abelardo 
-  secondary:  '#FFC107',
+  secondary:  '#FFC107', //Maycol
   background: '#F5F5F5',
   text:       '#333333',
   error:      '#D32F2F',
