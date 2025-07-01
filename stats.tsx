@@ -1,4 +1,12 @@
-// Importación de librerías necesarias
+// app/(tabs)/stats.tsx
+// Este archivo define una pantalla de estadísticas en una aplicación React Native utilizando Expo Router. 
+// Muestra estadísticas de tareas locales y datos remotos obtenidos de una API (adviceslip.com).
+// Utiliza el contexto de tareas para acceder a las tareas locales y muestra un indicador de carga mientras se obtienen los datos remotos.
+// Si ocurre un error al cargar los datos remotos, muestra un mensaje de error.
+// El estilo se define utilizando StyleSheet de React Native para mantener la consistencia visual en la aplicación.
+// El uso de ScrollView permite que el contenido sea desplazable, lo cual es útil para pantallas con mucho contenido.
+// Las estadísticas locales incluyen el total de tareas, las completadas y las pendientes.
+
 import React, { useContext, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
@@ -7,80 +15,50 @@ import {
   Text,
   View
 } from 'react-native';
-
-// Importación de constantes de estilo personalizadas
 import { COLORS, SPACING } from '../../constants/Colors';
-
-// Importación del contexto que contiene las tareas
 import { TaskContext } from '../../context/TaskContext';
 
 export default function StatsScreen() {
-  // Obtenemos las tareas desde el contexto
   const { tasks } = useContext(TaskContext);
 
-  // Estados para almacenar datos de la API
-  const [remoteItems, setRemoteItems] = useState<{ id: number; title: string }[]>([]);
-  const [loadingRemote, setLoadingRemote] = useState(true);           // Estado de carga
-  const [errorRemote, setErrorRemote] = useState<string | null>(null); // Estado de error
+  const [advice, setAdvice] = useState<string>('');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Hook useEffect para hacer la petición al montar el componente
   useEffect(() => {
-    fetch('https://jsonplaceholder.typicode.com/todos?_limit=5') // Petición a API de prueba
+    fetch('https://api.adviceslip.com/advice')
       .then(res => {
-        if (!res.ok) throw new Error(`Código ${res.status}`); // Manejo de errores HTTP
+        if (!res.ok) throw new Error(`Código ${res.status}`);
         return res.json();
       })
-      .then(data => {
-        // Formateamos los datos obtenidos
-        const items = (data as any[]).map(item => ({
-          id: item.id,
-          title: item.title,
-        }));
-        setRemoteItems(items); // Guardamos en el estado
+      .then((data: { slip: { advice: string } }) => {
+        setAdvice(data.slip.advice);
       })
-      .catch(err => setErrorRemote(err.message)) // Si hay error, lo almacenamos
-      .finally(() => setLoadingRemote(false));   // Terminamos la carga
+      .catch(err => setError(err.message))
+      .finally(() => setLoading(false));
   }, []);
 
-  // Cálculo de estadísticas locales
   const total     = tasks.length;
   const completed = tasks.filter(t => t.completed).length;
   const pending   = total - completed;
 
-  // Si los datos remotos están cargando, mostramos spinner
-  if (loadingRemote) {
-    return (
-      <View style={styles.center}>
-        <ActivityIndicator size="large" />
-      </View>
-    );
-  }
-
-  // Si hubo error al cargar los datos remotos, se muestra mensaje
-  if (errorRemote) {
-    return (
-      <View style={styles.center}>
-        <Text style={styles.errorText}>Error al cargar: {errorRemote}</Text>
-      </View>
-    );
-  }
-
-  // Render principal cuando ya hay datos cargados
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      {/* Sección de datos remotos */}
-      <Text style={styles.sectionTitle}>Datos remotos (JSONPlaceholder):</Text>
-      {remoteItems.map(item => (
-        <Text key={item.id} style={styles.remoteItem}>
-          • {item.title}
-        </Text>
-      ))}
+      <Text style={styles.sectionTitle}>💡 Consejo del día:</Text>
 
-      {/* Separador visual */}
+      {loading ? (
+        <ActivityIndicator size="large" color={COLORS.primary} />
+      ) : error ? (
+        <Text style={styles.errorText}>
+          No se pudo cargar el consejo: {error}
+        </Text>
+      ) : (
+        <Text style={styles.adviceText}>“{advice}”</Text>
+      )}
+
       <View style={styles.separator} />
 
-      {/* Sección de estadísticas locales */}
-      <Text style={styles.sectionTitle}>Estadísticas locales:</Text>
+      <Text style={styles.sectionTitle}>📊 Estadísticas locales:</Text>
       <Text style={styles.statText}>Total de tareas:   {total}</Text>
       <Text style={styles.statText}>Completadas:      {completed}</Text>
       <Text style={styles.statText}>Pendientes:       {pending}</Text>
@@ -88,18 +66,11 @@ export default function StatsScreen() {
   );
 }
 
-// Estilos para los componentes de la pantalla
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
     backgroundColor: COLORS.background,
     padding: SPACING.md,
-  },
-  center: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: COLORS.background,
   },
   sectionTitle: {
     fontWeight: 'bold',
@@ -107,9 +78,10 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.sm,
     fontSize: 18,
   },
-  remoteItem: {
-    marginBottom: SPACING.xs,
-    fontSize: 14,
+  adviceText: {
+    fontStyle: 'italic',
+    marginBottom: SPACING.lg,
+    fontSize: 16,
     color: COLORS.text,
   },
   separator: {
@@ -123,5 +95,7 @@ const styles = StyleSheet.create({
   errorText: {
     color: COLORS.error,
     fontSize: 14,
+    marginBottom: SPACING.lg,
   },
 });
+
