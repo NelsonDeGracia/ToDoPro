@@ -1,8 +1,14 @@
 // Importación de dependencias necesarias desde React y React Native
 import React, { useContext, useState } from 'react';
 import {
-  Alert, Button, ScrollView, StyleSheet, Switch,
-  Text, TextInput, View
+  Alert,         // Para mostrar diálogos de alerta
+  Button,        // Botón nativo de React Native
+  ScrollView,    // Contenedor desplazable
+  StyleSheet,    // Para definir estilos
+  Switch,        // Interruptor para opciones booleanas
+  Text,          // Para mostrar texto
+  TextInput,     // Campo de entrada de texto
+  View           // Contenedor genérico
 } from 'react-native';
 
 // Importación del contexto que maneja las tareas
@@ -10,45 +16,54 @@ import { TaskContext } from '../../context/TaskContext';
 
 export default function ProfileScreen() {
   // Estados locales para controlar edición del perfil y configuraciones
-  const [isEditing, setIsEditing] = useState(false);  // Modo de edición activado o no
-  const [name, setName] = useState('Abelardo Arrocha'); // Nombre del usuario
-  const [email, setEmail] = useState('ejemplo@correo.com'); // Correo electrónico
-  const [age, setAge] = useState('21'); // Edad
-  const [isDarkMode, setIsDarkMode] = useState(false); // Activación de modo oscuro
+  const [isEditing, setIsEditing] = useState(false);               // Controla si está en modo edición
+  const [name, setName] = useState('Abelardo Arrocha');           // Nombre del usuario
+  const [email, setEmail] = useState('ejemplo@correo.com');       // Correo electrónico del usuario
+  const [age, setAge] = useState('21');                           // Edad como texto para TextInput
+  const [isDarkMode, setIsDarkMode] = useState(false);            // Modo oscuro activado o no
   const [notificationsEnabled, setNotificationsEnabled] = useState(true); // Notificaciones activadas
 
-  // Obtenemos las tareas desde el contexto
+  // Obtenemos las tareas almacenadas desde el contexto global
   const { tasks } = useContext(TaskContext);
 
-  // Función que valida y guarda los cambios en el perfil
+  // Función que valida los campos y sale del modo edición si todo es correcto
   const handleSaveProfile = () => {
+    // Verifica que ningún campo esté vacío después de quitar espacios
     if (!name.trim() || !email.trim() || !age.trim()) {
       Alert.alert('Error', 'Todos los campos son obligatorios.');
       return;
     }
-    setIsEditing(false); // Sale del modo edición si los datos son válidos
+    // Si es válido, desactiva el modo edición
+    setIsEditing(false);
   };
 
   return (
-    <ScrollView contentContainerStyle={[
-      styles.container,
-      isDarkMode && styles.darkBackground // Cambia fondo si modo oscuro está activado
-    ]}>
-      {/* Título */}
+    // ScrollView con estilos dinámicos que cambian según el modo oscuro
+    <ScrollView
+      contentContainerStyle={[
+        styles.container,
+        isDarkMode && styles.darkBackground // Aplica fondo oscuro si corresponde
+      ]}
+    >
+      {/* Encabezado principal */}
       <Text style={[styles.heading, isDarkMode && styles.darkText]}>
         ⚙️ Perfil y Configuración
       </Text>
 
-      {/* Sección de edición del perfil si isEditing es true */}
       {isEditing ? (
+        // Si está en modo edición, muestra el formulario
         <>
-          {/* Campo: Nombre */}
+          {/* Campo de edición: Nombre */}
           <View style={styles.formRow}>
             <Text style={styles.label}>Nombre:</Text>
-            <TextInput style={styles.input} value={name} onChangeText={setName} />
+            <TextInput
+              style={styles.input}
+              value={name}
+              onChangeText={setName}
+            />
           </View>
 
-          {/* Campo: Correo */}
+          {/* Campo de edición: Correo electrónico */}
           <View style={styles.formRow}>
             <Text style={styles.label}>Correo:</Text>
             <TextInput
@@ -60,7 +75,7 @@ export default function ProfileScreen() {
             />
           </View>
 
-          {/* Campo: Edad */}
+          {/* Campo de edición: Edad */}
           <View style={styles.formRow}>
             <Text style={styles.label}>Edad:</Text>
             <TextInput
@@ -71,15 +86,19 @@ export default function ProfileScreen() {
             />
           </View>
 
-          {/* Botones para guardar o cancelar edición */}
+          {/* Botones para guardar o cancelar los cambios */}
           <View style={styles.buttonRow}>
             <Button title="Guardar" onPress={handleSaveProfile} />
-            <Button title="Cancelar" color="#777" onPress={() => setIsEditing(false)} />
+            <Button
+              title="Cancelar"
+              color="#777"
+              onPress={() => setIsEditing(false)}
+            />
           </View>
         </>
       ) : (
+        // Cuando NO está en modo edición, muestra los datos del perfil
         <>
-          {/* Vista del perfil sin edición */}
           <View style={styles.infoSection}>
             <Text style={styles.infoLabel}>Nombre:</Text>
             <Text style={[styles.infoText, isDarkMode && styles.darkText]}>
@@ -101,32 +120,39 @@ export default function ProfileScreen() {
             </Text>
           </View>
 
-          {/* Botón para activar modo edición */}
+          {/* Botón para entrar en modo edición */}
           <View style={styles.editButton}>
             <Button title="✏️ Editar perfil" onPress={() => setIsEditing(true)} />
           </View>
         </>
       )}
 
-      {/* Separador visual */}
+      {/* Línea separadora */}
       <View style={styles.separator} />
 
-      {/* Ajuste: Modo oscuro */}
+      {/* Sección de ajustes: Modo oscuro */}
       <View style={styles.section}>
-        <Text style={[styles.label, isDarkMode && styles.darkText]}>Modo oscuro</Text>
-        <Switch value={isDarkMode} onValueChange={() => setIsDarkMode(v => !v)} />
+        <Text style={[styles.label, isDarkMode && styles.darkText]}>
+          Modo oscuro
+        </Text>
+        <Switch
+          value={isDarkMode}
+          onValueChange={() => setIsDarkMode(v => !v)}
+        />
       </View>
 
-      {/* Ajuste: Notificaciones */}
+      {/* Sección de ajustes: Notificaciones */}
       <View style={styles.section}>
-        <Text style={[styles.label, isDarkMode && styles.darkText]}>Notificaciones</Text>
+        <Text style={[styles.label, isDarkMode && styles.darkText]}>
+          Notificaciones
+        </Text>
         <Switch
           value={notificationsEnabled}
           onValueChange={() => setNotificationsEnabled(v => !v)}
         />
       </View>
 
-      {/* Pie de página con información de tareas */}
+      {/* Pie de página que muestra cuántas tareas hay */}
       <View style={styles.footer}>
         <Text style={[styles.subheading, isDarkMode && styles.darkText]}>
           Tienes {tasks.length} tareas almacenadas
@@ -136,7 +162,7 @@ export default function ProfileScreen() {
   );
 }
 
-// Estilos para la pantalla y elementos
+// Definición de estilos para los diferentes elementos de la pantalla
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
