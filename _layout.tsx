@@ -1,27 +1,36 @@
 // app/(tabs)/_layout.tsx
-import { MaterialIcons } from '@expo/vector-icons';
-import { Tabs } from 'expo-router';
-import React from 'react';
+// Este archivo define la estructura de navegación por pestañas (bottom tabs) usando Expo Router.
 
-// Layout principal con navegación por pestañas sin encabezado
+// -------------------- IMPORTACIONES --------------------
+
+import { MaterialIcons } from '@expo/vector-icons'; // Íconos de Material Design para las pestañas
+import { Tabs } from 'expo-router';                 // Componente Tabs que permite navegación por pestañas
+import React from 'react';                          // Importación estándar de React
+
+// -------------------- COMPONENTE DE LAYOUT DE PESTAÑAS --------------------
+
 export default function TabsLayout() {
   return (
-    <Tabs screenOptions={{ headerShown: false }}>
-      
-      {/* Pestaña de lista de tareas (index.tsx) */}
+    // El componente Tabs crea una navegación tipo "Bottom Tab Navigator"
+    <Tabs
+      screenOptions={{
+        headerShown: false // Oculta la cabecera superior en cada pantalla
+      }}
+    >
+      {/* ---------- PESTAÑA: LISTA DE TAREAS (index.tsx) ---------- */}
       <Tabs.Screen
-        name="index"
+        name="index" // Corresponde al archivo app/(tabs)/index.tsx
         options={{
-          title: 'Tareas',
+          title: 'Tareas', // Texto que se muestra debajo del ícono
           tabBarIcon: ({ color, size }) => (
             <MaterialIcons name="list" size={size} color={color} />
           )
         }}
       />
 
-      {/* Pestaña de estadísticas (stats.tsx) */}
+      {/* ---------- PESTAÑA: ESTADÍSTICAS (stats.tsx) ---------- */}
       <Tabs.Screen
-        name="stats"
+        name="stats" // Corresponde al archivo app/(tabs)/stats.tsx
         options={{
           title: 'Estadísticas',
           tabBarIcon: ({ color, size }) => (
@@ -30,9 +39,9 @@ export default function TabsLayout() {
         }}
       />
 
-      {/* Pestaña de perfil del usuario (profile.tsx) */}
+      {/* ---------- PESTAÑA: PERFIL DEL USUARIO (profile.tsx) ---------- */}
       <Tabs.Screen
-        name="profile"
+        name="profile" // Corresponde al archivo app/(tabs)/profile.tsx
         options={{
           title: 'Perfil',
           tabBarIcon: ({ color, size }) => (
@@ -43,7 +52,15 @@ export default function TabsLayout() {
     </Tabs>
   );
 }
-// Este código define un layout de pestañas (Tabs) utilizando Expo Router.
-// El layout contiene tres pestañas: "Tareas", "Estadísticas" y "Perfil".
-// Cada pestaña tiene un ícono asociado utilizando Material Icons.
-// Las pestañas están configuradas para no mostrar un encabezado (headerShown: false).  
+
+/*
+RESUMEN:
+Este componente representa el diseño de navegación inferior de la app.
+Cada pestaña está asociada a una ruta específica y tiene su ícono correspondiente:
+  - index.tsx      → "Tareas"      → icono: list
+  - stats.tsx      → "Estadísticas"→ icono: bar-chart
+  - profile.tsx    → "Perfil"      → icono: person
+
+Se utiliza el sistema de rutas anidadas de Expo Router, y se oculta el encabezado superior
+para lograr una apariencia limpia en cada pestaña.
+*/
