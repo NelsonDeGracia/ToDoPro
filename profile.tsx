@@ -1,69 +1,71 @@
-// Importación de dependencias necesarias desde React y React Native
+// Importación de librerías de React y React Native necesarias para la interfaz y control de estado
 import React, { useContext, useState } from 'react';
 import {
-  Alert,         // Para mostrar diálogos de alerta
-  Button,        // Botón nativo de React Native
-  ScrollView,    // Contenedor desplazable
-  StyleSheet,    // Para definir estilos
-  Switch,        // Interruptor para opciones booleanas
-  Text,          // Para mostrar texto
-  TextInput,     // Campo de entrada de texto
-  View           // Contenedor genérico
+  Alert,         // Muestra mensajes emergentes para errores o confirmaciones
+  Button,        // Componente de botón nativo
+  ScrollView,    // Permite desplazar el contenido verticalmente
+  StyleSheet,    // Define estilos personalizados
+  Switch,        // Componente de interruptor booleano
+  Text,          // Muestra texto estático
+  TextInput,     // Campo de entrada de texto editable
+  View           // Contenedor general para organizar la estructura visual
 } from 'react-native';
 
-// Importación del contexto que maneja las tareas
+// Importa el contexto de tareas definido en otro archivo para obtener datos globales
 import { TaskContext } from '../../context/TaskContext';
 
+// Componente principal de perfil del usuario
 export default function ProfileScreen() {
-  // Estados locales para controlar edición del perfil y configuraciones
-  const [isEditing, setIsEditing] = useState(false);               // Controla si está en modo edición
-  const [name, setName] = useState('Abelardo Arrocha');           // Nombre del usuario
-  const [email, setEmail] = useState('ejemplo@correo.com');       // Correo electrónico del usuario
-  const [age, setAge] = useState('21');                           // Edad como texto para TextInput
-  const [isDarkMode, setIsDarkMode] = useState(false);            // Modo oscuro activado o no
-  const [notificationsEnabled, setNotificationsEnabled] = useState(true); // Notificaciones activadas
+  // Estados locales para manejar los datos del perfil y configuración del usuario
+  const [isEditing, setIsEditing] = useState(false); // Activa o desactiva el modo edición
+  const [name, setName] = useState('Abelardo Arrocha'); // Nombre del usuario
+  const [email, setEmail] = useState('ejemplo@correo.com'); // Email del usuario
+  const [age, setAge] = useState('21'); // Edad representada como cadena para facilitar el TextInput
+  const [isDarkMode, setIsDarkMode] = useState(false); // Activa o desactiva el modo oscuro
+  const [notificationsEnabled, setNotificationsEnabled] = useState(true); // Activa o desactiva las notificaciones
 
-  // Obtenemos las tareas almacenadas desde el contexto global
+  // Accede al array de tareas desde el contexto global de la app
   const { tasks } = useContext(TaskContext);
 
-  // Función que valida los campos y sale del modo edición si todo es correcto
+  // Función ejecutada al presionar "Guardar" para validar los campos del formulario
   const handleSaveProfile = () => {
     // Verifica que ningún campo esté vacío después de quitar espacios
     if (!name.trim() || !email.trim() || !age.trim()) {
-      Alert.alert('Error', 'Todos los campos son obligatorios.');
+      Alert.alert('Error', 'Todos los campos son obligatorios.'); // Muestra alerta si hay errores
       return;
     }
-    // Si es válido, desactiva el modo edición
+    // Si todo está bien, sale del modo edición
     setIsEditing(false);
   };
 
   return (
-    // ScrollView con estilos dinámicos que cambian según el modo oscuro
+    // ScrollView permite que el contenido sea desplazable en pantallas pequeñas
     <ScrollView
       contentContainerStyle={[
-        styles.container,
-        isDarkMode && styles.darkBackground // Aplica fondo oscuro si corresponde
+        styles.container,                  // Estilo base del contenedor
+        isDarkMode && styles.darkBackground // Aplica fondo oscuro si está activado
       ]}
     >
-      {/* Encabezado principal */}
+      {/* Encabezado principal de la pantalla */}
       <Text style={[styles.heading, isDarkMode && styles.darkText]}>
         ⚙️ Perfil y Configuración
       </Text>
 
+      {/* Si está en modo edición, se muestran los campos para editar nombre, correo y edad */}
       {isEditing ? (
-        // Si está en modo edición, muestra el formulario
         <>
-          {/* Campo de edición: Nombre */}
+          {/* Campo: Nombre */}
           <View style={styles.formRow}>
             <Text style={styles.label}>Nombre:</Text>
             <TextInput
               style={styles.input}
               value={name}
               onChangeText={setName}
+              placeholder="Ingresa tu nombre completo"
             />
           </View>
 
-          {/* Campo de edición: Correo electrónico */}
+          {/* Campo: Correo electrónico */}
           <View style={styles.formRow}>
             <Text style={styles.label}>Correo:</Text>
             <TextInput
@@ -72,10 +74,11 @@ export default function ProfileScreen() {
               onChangeText={setEmail}
               keyboardType="email-address"
               autoCapitalize="none"
+              placeholder="correo@ejemplo.com"
             />
           </View>
 
-          {/* Campo de edición: Edad */}
+          {/* Campo: Edad */}
           <View style={styles.formRow}>
             <Text style={styles.label}>Edad:</Text>
             <TextInput
@@ -83,21 +86,22 @@ export default function ProfileScreen() {
               value={age}
               onChangeText={setAge}
               keyboardType="numeric"
+              placeholder="Ej. 21"
             />
           </View>
 
-          {/* Botones para guardar o cancelar los cambios */}
+          {/* Botones de acción para guardar o cancelar los cambios */}
           <View style={styles.buttonRow}>
             <Button title="Guardar" onPress={handleSaveProfile} />
             <Button
               title="Cancelar"
               color="#777"
-              onPress={() => setIsEditing(false)}
+              onPress={() => setIsEditing(false)} // Cancela edición y vuelve al modo lectura
             />
           </View>
         </>
       ) : (
-        // Cuando NO está en modo edición, muestra los datos del perfil
+        // Si no está en modo edición, muestra los datos como texto solamente
         <>
           <View style={styles.infoSection}>
             <Text style={styles.infoLabel}>Nombre:</Text>
@@ -120,39 +124,39 @@ export default function ProfileScreen() {
             </Text>
           </View>
 
-          {/* Botón para entrar en modo edición */}
+          {/* Botón para activar el modo edición */}
           <View style={styles.editButton}>
             <Button title="✏️ Editar perfil" onPress={() => setIsEditing(true)} />
           </View>
         </>
       )}
 
-      {/* Línea separadora */}
+      {/* Línea divisoria entre perfil y configuraciones */}
       <View style={styles.separator} />
 
-      {/* Sección de ajustes: Modo oscuro */}
+      {/* Configuración de modo oscuro con interruptor */}
       <View style={styles.section}>
         <Text style={[styles.label, isDarkMode && styles.darkText]}>
           Modo oscuro
         </Text>
         <Switch
           value={isDarkMode}
-          onValueChange={() => setIsDarkMode(v => !v)}
+          onValueChange={() => setIsDarkMode(v => !v)} // Cambia el estado del modo oscuro
         />
       </View>
 
-      {/* Sección de ajustes: Notificaciones */}
+      {/* Configuración de notificaciones con interruptor */}
       <View style={styles.section}>
         <Text style={[styles.label, isDarkMode && styles.darkText]}>
           Notificaciones
         </Text>
         <Switch
           value={notificationsEnabled}
-          onValueChange={() => setNotificationsEnabled(v => !v)}
+          onValueChange={() => setNotificationsEnabled(v => !v)} // Cambia el estado de las notificaciones
         />
       </View>
 
-      {/* Pie de página que muestra cuántas tareas hay */}
+      {/* Pie de página que muestra cuántas tareas tiene el usuario */}
       <View style={styles.footer}>
         <Text style={[styles.subheading, isDarkMode && styles.darkText]}>
           Tienes {tasks.length} tareas almacenadas
@@ -162,25 +166,25 @@ export default function ProfileScreen() {
   );
 }
 
-// Definición de estilos para los diferentes elementos de la pantalla
+// Definición de los estilos que se usan en toda la pantalla
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
     padding: 16,
-    backgroundColor: '#fff'
+    backgroundColor: '#fff' // Fondo claro por defecto
   },
   darkBackground: {
-    backgroundColor: '#333'
+    backgroundColor: '#333' // Fondo oscuro si el modo oscuro está activado
   },
   heading: {
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 24,
-    color: '#1E88E5',
+    color: '#1E88E5', // Azul vibrante
     textAlign: 'center'
   },
   darkText: {
-    color: '#fff'
+    color: '#fff' // Texto blanco para fondo oscuro
   },
   infoSection: {
     flexDirection: 'row',
