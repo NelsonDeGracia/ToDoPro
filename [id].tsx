@@ -5,38 +5,42 @@
 // Pantalla de detalle de una tarea: ver, actualizar y eliminar
 // Importaciones necesarias desde Expo Router y React Native
 import { useLocalSearchParams, useRouter } from 'expo-router';
+
+// React y React Native para lógica de estado y componentes UI
 import React, { useContext, useEffect, useState } from 'react';
 import {
-  Alert,        // Para mostrar confirmaciones y advertencias
-  Button,       // Botones para acciones
-  Platform,     // Detecta si se ejecuta en Web o móvil
-  StyleSheet,
-  Text,
-  TextInput,
-  View
+  Alert,        // Alerta visual para confirmaciones (en móvil)
+  Button,       // Botón interactivo
+  Platform,     // Detecta si la app corre en web o en móvil
+  StyleSheet,   // Definición de estilos
+  Text,         // Texto estático
+  TextInput,    // Campo editable
+  View          // Contenedor visual
 } from 'react-native';
 
-// Importamos el contexto que contiene las tareas
+// Importamos el contexto global donde se encuentran las tareas y funciones
 import { TaskContext } from '../../context/TaskContext';
 
+// -------------------- COMPONENTE PRINCIPAL --------------------
+
 export default function TaskDetailScreen() {
-  // Obtenemos el parámetro 'id' desde la URL
+  // Extrae el parámetro dinámico 'id' de la ruta actual (usado para buscar la tarea específica)
   const { id } = useLocalSearchParams<{ id: string }>();
 
-  // Accedemos a funciones y tareas desde el contexto
+  // Acceso al contexto: lista de tareas + funciones para modificar o eliminar
   const { tasks, updateTask, deleteTask } = useContext(TaskContext);
 
-  // Permite navegación entre pantallas
+  // Hook para navegar entre pantallas (volver atrás, etc.)
   const router = useRouter();
 
-  // Buscamos la tarea actual por su ID
+  // Busca la tarea correspondiente al ID recibido desde la ruta
   const task = tasks.find(t => t.id === id);
 
-  // Estados para edición de título y descripción
-  const [title, setTitle] = useState(task?.title ?? '');
-  const [description, setDescription] = useState(task?.description ?? '');
+  // Estados locales para editar los campos de la tarea
+  const [title, setTitle] = useState(task?.title ?? '');               // Título editable
+  const [description, setDescription] = useState(task?.description ?? ''); // Descripción editable
 
-  // Actualizamos los campos cuando cambia la tarea (por seguridad)
+  // Cuando se cambia de tarea (cambio de ID), se actualizan los campos por seguridad
   useEffect(() => {
     if (task) {
       setTitle(task.title);
@@ -44,7 +48,7 @@ export default function TaskDetailScreen() {
     }
   }, [task]);
 
-  // Si no se encuentra la tarea, se muestra mensaje
+  // Si no se encontró una tarea con ese ID, muestra mensaje de error
   if (!task) {
     return (
       <View style={styles.center}>
@@ -53,35 +57,50 @@ export default function TaskDetailScreen() {
     );
   }
 
-  // Función para actualizar la tarea
+  // -------------------- FUNCIONES --------------------
+
+  // Función que actualiza la tarea usando los valores actuales de los campos
   const onUpdate = () => {
-    if (!title.trim()) return Alert.alert('Error', 'El título no puede quedar vacío');
-    updateTask({ ...task, title: title.trim(), description: description.trim() });
-    router.back(); // Regresa a pantalla anterior
+    if (!title.trim()) {
+      return Alert.alert('Error', 'El título no puede quedar vacío');
+    }
+
+    // Llama a la función del contexto para actualizar y vuelve atrás
+    updateTask({
+      ...task, // Mantiene ID y otros campos
+      title: title.trim(),
+      description: description.trim()
+    });
+
+    router.back(); // Regresa a la pantalla anterior
   };
 
-  // Función para eliminar la tarea (con confirmación)
+  // Función para eliminar la tarea, con confirmación diferente según plataforma
   const onDelete = () => {
     console.log('🔵 [Detail] onDelete llamado para id:', task.id);
 
-    // Si está en navegador web, usamos confirm()
+    // En plataforma Web, se usa window.confirm
     if (Platform.OS === 'web') {
       const ok = window.confirm('¿Seguro que quieres eliminar esta tarea?');
       console.log('🔘 [Detail:web] confirm result:', ok);
       if (ok) {
-        deleteTask(task.id);
+        deleteTask(task.id); // Elimina la tarea
         console.log('🟢 [Detail:web] deleteTask invocado');
-        router.back();
+        router.back(); // Vuelve atrás
       }
       return;
     }
 
-    // En móvil, usamos Alert de React Native
+    // En móvil (Android/iOS), se usa Alert con botones
     Alert.alert(
       'Confirmar eliminación',
       '¿Seguro que quieres eliminar esta tarea?',
       [
-        { text: 'Cancelar', style: 'cancel', onPress: () => console.log('⚪️ [Detail] Canceló borrado') },
+        {
+          text: 'Cancelar',
+          style: 'cancel',
+          onPress: () => console.log('⚪️ [Detail] Canceló borrado')
+        },
         {
           text: 'Eliminar',
           style: 'destructive',
@@ -89,51 +108,77 @@ export default function TaskDetailScreen() {
             console.log('🔴 [Detail] Confirmó borrado, invocando deleteTask');
             deleteTask(task.id);
             console.log('🟢 [Detail] deleteTask invocado');
-            router.back();
+            router.back(); // Regresa a la pantalla anterior
           }
         }
       ]
     );
   };
 
-  // Render principal
+  // -------------------- RENDERIZADO --------------------
+
   return (
     <View style={styles.container}>
+      {/* Campo de texto para editar título */}
       <Text style={styles.label}>Título:</Text>
-      <TextInput value={title} onChangeText={setTitle} style={styles.input} />
+      <TextInput
+        value={title}
+        onChangeText={setTitle}
+        style={styles.input}
+        placeholder="Título de la tarea"
+      />
 
+      {/* Campo de texto para editar descripción */}
       <Text style={styles.label}>Descripción:</Text>
       <TextInput
         value={description}
         onChangeText={setDescription}
         style={[styles.input, styles.textarea]}
         multiline
+        placeholder="Descripción de la tarea"
       />
 
-      {/* Botón para guardar cambios */}
+      {/* Botón para guardar los cambios */}
       <Button title="Actualizar" onPress={onUpdate} />
-      
-      {/* Separador visual */}
+
+      {/* Espacio visual */}
       <View style={{ height: 12 }} />
 
-      {/* Botón para eliminar tarea */}
+      {/* Botón para eliminar la tarea */}
       <Button title="Eliminar tarea" color="red" onPress={onDelete} />
     </View>
   );
 }
 
-// Estilos personalizados para esta pantalla
-const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16 },
-  center: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 16 },
-  label: { fontWeight: 'bold', marginBottom: 4 },
-  input: {
-    borderWidth: 1, borderColor: '#ccc',
-    padding: 8, marginBottom: 16, borderRadius: 4
-  },
-  textarea: { height: 80, textAlignVertical: 'top' }
-});
+// -------------------- ESTILOS --------------------
 
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,             // Ocupa toda la pantalla disponible
+    padding: 16          // Espaciado interno
+  },
+  center: {
+    flex: 1,
+    justifyContent: 'center', // Centra verticalmente
+    alignItems: 'center',     // Centra horizontalmente
+    padding: 16
+  },
+  label: {
+    fontWeight: 'bold',       // Texto en negrita
+    marginBottom: 4           // Espaciado inferior
+  },
+  input: {
+    borderWidth: 1,           // Borde alrededor del campo
+    borderColor: '#ccc',      // Color gris claro
+    padding: 8,               // Espaciado interno
+    marginBottom: 16,         // Espaciado inferior entre campos
+    borderRadius: 4           // Bordes redondeados
+  },
+  textarea: {
+    height: 80,               // Altura para que parezca área de texto
+    textAlignVertical: 'top'  // Alineación del texto desde la parte superior
+  }
+});
 
 
 // Este código define una pantalla de detalle de tarea en una aplicación de gestión de tareas utilizando Expo Router y React.
