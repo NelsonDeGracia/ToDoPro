@@ -4,7 +4,7 @@
 // Muy útil para mantener la consistencia visual y facilitar el mantenimiento del código.
 
 export const COLORS = {
-  primary:    '#1E88E5', 
+  primary:    '#1E88E5' 
   secondary:  '#FFC107', 
   background: '#F5F5F5',
   text:       '#333333',
