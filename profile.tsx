@@ -1,162 +1,195 @@
-// Importación de librerías de React y React Native necesarias para la interfaz y control de estado
+// app/(tabs)/profile.tsx
+
+import { Picker } from '@react-native-picker/picker';
 import React, { useContext, useState } from 'react';
 import {
-  Alert,         // Muestra mensajes emergentes para errores o confirmaciones
-  Button,        // Componente de botón nativo
-  ScrollView,    // Permite desplazar el contenido verticalmente
-  StyleSheet,    // Define estilos personalizados
-  Switch,        // Componente de interruptor booleano
-  Text,          // Muestra texto estático
-  TextInput,     // Campo de entrada de texto editable
-  View           // Contenedor general para organizar la estructura visual
+  Alert,
+  Button,
+  ScrollView,
+  StyleSheet,
+  Switch,
+  Text,
+  TextInput,
+  View
 } from 'react-native';
-
-// Importa el contexto de tareas definido en otro archivo para obtener datos globales
 import { TaskContext } from '../../context/TaskContext';
 
-// Componente principal de perfil del usuario
-export default function ProfileScreen() {
-  // Estados locales para manejar los datos del perfil y configuración del usuario
-  const [isEditing, setIsEditing] = useState(false); // Activa o desactiva el modo edición
-  const [name, setName] = useState('Abelardo Arrocha'); // Nombre del usuario
-  const [email, setEmail] = useState('ejemplo@correo.com'); // Email del usuario
-  const [age, setAge] = useState('21'); // Edad representada como cadena para facilitar el TextInput
-  const [isDarkMode, setIsDarkMode] = useState(false); // Activa o desactiva el modo oscuro
-  const [notificationsEnabled, setNotificationsEnabled] = useState(true); // Activa o desactiva las notificaciones
+type Language = 'es' | 'en';
+type TimeFormat = '12h' | '24h';
 
-  // Accede al array de tareas desde el contexto global de la app
+export default function ProfileScreen() {
+  const [isEditing, setIsEditing] = useState(false);
+  const [name, setName]       = useState('Usuario Ejemplo');
+  const [email, setEmail]     = useState('ejemplo@correo.com');
+  const [age, setAge]         = useState('21');
+
+  const [isDarkMode, setIsDarkMode]               = useState(false);
+  const [notificationsEnabled, setNotifications]  = useState(true);
+
+  // Nuevos ajustes
+  const [language, setLanguage]       = useState<Language>('es');
+  const [timeFormat, setTimeFormat]   = useState<TimeFormat>('24h');
+
   const { tasks } = useContext(TaskContext);
 
-  // Función ejecutada al presionar "Guardar" para validar los campos del formulario
   const handleSaveProfile = () => {
-    // Verifica que ningún campo esté vacío después de quitar espacios
     if (!name.trim() || !email.trim() || !age.trim()) {
-      Alert.alert('Error', 'Todos los campos son obligatorios.'); // Muestra alerta si hay errores
+      Alert.alert('Error', 'Todos los campos son obligatorios.');
       return;
     }
-    // Si todo está bien, sale del modo edición
     setIsEditing(false);
+    // Aquí podrías persistir los ajustes (language, timeFormat, sortOption)
   };
 
   return (
-    // ScrollView permite que el contenido sea desplazable en pantallas pequeñas
     <ScrollView
       contentContainerStyle={[
-        styles.container,                  // Estilo base del contenedor
-        isDarkMode && styles.darkBackground // Aplica fondo oscuro si está activado
+        styles.container,
+        isDarkMode && styles.darkBackground
       ]}
     >
-      {/* Encabezado principal de la pantalla */}
       <Text style={[styles.heading, isDarkMode && styles.darkText]}>
         ⚙️ Perfil y Configuración
       </Text>
 
-      {/* Si está en modo edición, se muestran los campos para editar nombre, correo y edad */}
       {isEditing ? (
         <>
-          {/* Campo: Nombre */}
+          {/* Campos de datos personales */}
           <View style={styles.formRow}>
-            <Text style={styles.label}>Nombre:</Text>
+            <Text style={[styles.label, isDarkMode && styles.darkText]}>
+              Nombre:
+            </Text>
             <TextInput
-              style={styles.input}
+              style={[styles.input, isDarkMode && styles.inputDark]}
               value={name}
               onChangeText={setName}
-              placeholder="Ingresa tu nombre completo"
+              placeholder="Tu nombre"
+              placeholderTextColor={isDarkMode ? '#888' : '#999'}
             />
           </View>
-
-          {/* Campo: Correo electrónico */}
           <View style={styles.formRow}>
-            <Text style={styles.label}>Correo:</Text>
+            <Text style={[styles.label, isDarkMode && styles.darkText]}>
+              Correo:
+            </Text>
             <TextInput
-              style={styles.input}
+              style={[styles.input, isDarkMode && styles.inputDark]}
               value={email}
               onChangeText={setEmail}
+              placeholder="tucorreo@ejemplo.com"
+              placeholderTextColor={isDarkMode ? '#888' : '#999'}
               keyboardType="email-address"
               autoCapitalize="none"
-              placeholder="correo@ejemplo.com"
             />
           </View>
-
-          {/* Campo: Edad */}
           <View style={styles.formRow}>
-            <Text style={styles.label}>Edad:</Text>
+            <Text style={[styles.label, isDarkMode && styles.darkText]}>
+              Edad:
+            </Text>
             <TextInput
-              style={styles.input}
+              style={[styles.input, isDarkMode && styles.inputDark]}
               value={age}
               onChangeText={setAge}
+              placeholder="Tu edad"
+              placeholderTextColor={isDarkMode ? '#888' : '#999'}
               keyboardType="numeric"
-              placeholder="Ej. 21"
             />
           </View>
 
-          {/* Botones de acción para guardar o cancelar los cambios */}
+          {/* Botones guardar/cancelar */}
           <View style={styles.buttonRow}>
             <Button title="Guardar" onPress={handleSaveProfile} />
             <Button
               title="Cancelar"
               color="#777"
-              onPress={() => setIsEditing(false)} // Cancela edición y vuelve al modo lectura
+              onPress={() => setIsEditing(false)}
             />
           </View>
         </>
       ) : (
-        // Si no está en modo edición, muestra los datos como texto solamente
         <>
+          {/* Vista de datos personales */}
           <View style={styles.infoSection}>
-            <Text style={styles.infoLabel}>Nombre:</Text>
+            <Text style={[styles.infoLabel, isDarkMode && styles.darkText]}>
+              Nombre:
+            </Text>
             <Text style={[styles.infoText, isDarkMode && styles.darkText]}>
               {name}
             </Text>
           </View>
-
           <View style={styles.infoSection}>
-            <Text style={styles.infoLabel}>Correo:</Text>
+            <Text style={[styles.infoLabel, isDarkMode && styles.darkText]}>
+              Correo:
+            </Text>
             <Text style={[styles.infoText, isDarkMode && styles.darkText]}>
               {email}
             </Text>
           </View>
-
           <View style={styles.infoSection}>
-            <Text style={styles.infoLabel}>Edad:</Text>
+            <Text style={[styles.infoLabel, isDarkMode && styles.darkText]}>
+              Edad:
+            </Text>
             <Text style={[styles.infoText, isDarkMode && styles.darkText]}>
               {age} años
             </Text>
           </View>
-
-          {/* Botón para activar el modo edición */}
           <View style={styles.editButton}>
             <Button title="✏️ Editar perfil" onPress={() => setIsEditing(true)} />
           </View>
         </>
       )}
 
-      {/* Línea divisoria entre perfil y configuraciones */}
       <View style={styles.separator} />
 
-      {/* Configuración de modo oscuro con interruptor */}
+      {/* Ajustes de UI */}
       <View style={styles.section}>
         <Text style={[styles.label, isDarkMode && styles.darkText]}>
           Modo oscuro
         </Text>
         <Switch
           value={isDarkMode}
-          onValueChange={() => setIsDarkMode(v => !v)} // Cambia el estado del modo oscuro
+          onValueChange={() => setIsDarkMode(v => !v)}
         />
       </View>
-
-      {/* Configuración de notificaciones con interruptor */}
       <View style={styles.section}>
         <Text style={[styles.label, isDarkMode && styles.darkText]}>
           Notificaciones
         </Text>
         <Switch
           value={notificationsEnabled}
-          onValueChange={() => setNotificationsEnabled(v => !v)} // Cambia el estado de las notificaciones
+          onValueChange={() => setNotifications(v => !v)}
         />
       </View>
 
-      {/* Pie de página que muestra cuántas tareas tiene el usuario */}
+      {/* Nuevo: Idioma */}
+      <View style={styles.section}>
+        <Text style={[styles.label, isDarkMode && styles.darkText]}>
+          Idioma
+        </Text>
+        <Picker
+          selectedValue={language}
+          onValueChange={val => setLanguage(val as Language)}
+          style={[styles.picker, isDarkMode && styles.pickerDark]}
+        >
+          <Picker.Item label="Español" value="es" />
+          <Picker.Item label="Inglés"   value="en" />
+        </Picker>
+      </View>
+
+      {/* Nuevo: Formato de hora */}
+      <View style={styles.section}>
+        <Text style={[styles.label, isDarkMode && styles.darkText]}>
+          Formato de hora
+        </Text>
+        <Picker
+          selectedValue={timeFormat}
+          onValueChange={val => setTimeFormat(val as TimeFormat)}
+          style={[styles.picker, isDarkMode && styles.pickerDark]}
+        >
+          <Picker.Item label="24 horas" value="24h" />
+          <Picker.Item label="12 horas" value="12h" />
+        </Picker>
+      </View>
+
       <View style={styles.footer}>
         <Text style={[styles.subheading, isDarkMode && styles.darkText]}>
           Tienes {tasks.length} tareas almacenadas
@@ -166,79 +199,41 @@ export default function ProfileScreen() {
   );
 }
 
-// Definición de los estilos que se usan en toda la pantalla
 const styles = StyleSheet.create({
-  container: {
-    flexGrow: 1,
-    padding: 16,
-    backgroundColor: '#fff' // Fondo claro por defecto
-  },
-  darkBackground: {
-    backgroundColor: '#333' // Fondo oscuro si el modo oscuro está activado
-  },
-  heading: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 24,
-    color: '#1E88E5', // Azul vibrante
-    textAlign: 'center'
-  },
-  darkText: {
-    color: '#fff' // Texto blanco para fondo oscuro
-  },
-  infoSection: {
-    flexDirection: 'row',
-    marginBottom: 12
-  },
-  infoLabel: {
-    fontWeight: 'bold',
-    width: 80,
-    fontSize: 16,
-    color: '#333'
-  },
-  infoText: {
-    fontSize: 16,
-    color: '#555'
-  },
-  editButton: {
-    marginVertical: 12,
-    alignItems: 'flex-start'
-  },
-  formRow: {
-    marginBottom: 12
-  },
-  label: {
-    fontSize: 16,
-    color: '#333'
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#aaa',
-    padding: 8,
-    marginTop: 4,
-    borderRadius: 4
-  },
-  buttonRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 16
-  },
-  separator: {
-    height: 1,
-    backgroundColor: '#ccc',
-    marginVertical: 16
-  },
-  section: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginVertical: 12
-  },
-  footer: {
-    marginTop: 24,
-    alignItems: 'center'
-  },
-  subheading: {
-    fontSize: 16
-  }
+  container:    { flexGrow:1, padding:16, backgroundColor:'#fff' },
+  darkBackground:{ backgroundColor:'#333' },
+  heading:      { fontSize:24, fontWeight:'bold', marginBottom:24, color:'#1E88E5', textAlign:'center' },
+  darkText:     { color:'#fff' },
+
+  infoSection:  { flexDirection:'row', marginBottom:12 },
+  infoLabel:    { fontWeight:'bold', width:80, fontSize:16, color:'#333' },
+  infoText:     { fontSize:16, color:'#555' },
+  editButton:   { marginVertical:12, alignItems:'flex-start' },
+
+  formRow:      { marginBottom:12 },
+  label:        { fontSize:16, color:'#333' },
+  input:        { borderWidth:1, borderColor:'#aaa', padding:8, marginTop:4, borderRadius:4, color:'#000' },
+  inputDark:    { borderColor:'#555', color:'#fff' },
+  buttonRow:    { flexDirection:'row', justifyContent:'space-between', marginBottom:16 },
+
+  separator:    { height:1, backgroundColor:'#ccc', marginVertical:16 },
+  section:      { flexDirection:'row', justifyContent:'space-between', alignItems:'center', marginVertical:12 },
+  picker:       { flex:1, marginLeft:8 },
+  pickerDark:   { backgroundColor:'#555', color:'#fff' },
+
+  footer:       { marginTop:24, alignItems:'center' },
+  subheading:   { fontSize:16, color:'#333' },
 });
+
+// Este código define una pantalla de perfil y configuración en una aplicación React Native utilizando Expo Router.
+// Permite al usuario ver y editar su perfil, así como ajustar configuraciones como el modo oscuro y las notificaciones.
+// Utiliza el contexto de tareas para mostrar la cantidad de tareas almacenadas y permite limpiar todas las tareas con confirmación previa.
+// El estilo se define utilizando StyleSheet de React Native para mantener la consistencia visual en la aplicación.
+// El uso de ScrollView permite que el contenido sea desplazable, lo cual es útil para pantallas con mucho contenido.
+// El uso de Switch permite al usuario activar o desactivar opciones de configuración de manera intuitiva.
+// El uso de Alert permite mostrar mensajes de confirmación antes de realizar acciones destructivas como eliminar todas las tareas.
+// Este enfoque modular y basado en contexto facilita la gestión del estado de las tareas y la navegación entre pantallas en la aplicación.
+// Además, el uso de estados locales permite manejar la edición del perfil y las configuraciones de manera eficiente.
+// La pantalla está diseñada para ser responsiva y fácil de usar, con un enfoque en la usabilidad y la experiencia del usuario.
+// El uso de TextInput permite al usuario ingresar y editar su información de perfil, mientras que
+// los botones permiten guardar cambios o cancelar la edición de manera sencilla. 
