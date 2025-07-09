@@ -1,11 +1,16 @@
 // constants/Colors.tsx
 // este codigo lo que hace es definir un conjunto de constantes que representan colores y espaciados que se pueden usar en toda la aplicación.
 // de esta manera, si en el futuro queremos cambiar un color o un espaciado,
-// Muy útil para mantener la consistencia visual y facilitar el mantenimiento del código.
+// solo tenemos que hacerlo en un lugar, y se reflejará en toda la aplicación.
+// esto es útil para mantener la consistencia visual y facilitar el mantenimiento del código.
+
+// constants/Colors.tsx
+
+import { Category } from '../context/TaskContext';
 
 export const COLORS = {
-  primary:    '#1E88E5' 
-  secondary:  '#FFC107', 
+  primary:    '#1E88E5',
+  secondary:  '#FFC107',
   background: '#F5F5F5',
   text:       '#333333',
   error:      '#D32F2F',
@@ -17,4 +22,11 @@ export const SPACING = {
   md: 16,
   lg: 24,
   xl: 32,
+};
+
+// Colores para cada categoría
+export const CATEGORY_COLORS: Record<Category, string> = {
+  Universidad: '#1E88E5',
+  Trabajo:     '#43A047',
+  Hogar:       '#FB8C00',
 };
