@@ -7,68 +7,107 @@
 // El uso de Alert permite mostrar mensajes de error si el título no se proporciona al intentar guardar la tarea.
 // Este enfoque modular y basado en contexto facilita la gestión del estado de las tareas y la navegación entre pantallas en la aplicación.
 
+import { Picker } from '@react-native-picker/picker';
 import { useRouter } from 'expo-router';
-// Hook para navegar entre pantallas
-
 import React, { useContext, useState } from 'react';
-// React y hooks para estado local y contexto
-
-import { Alert, Button, StyleSheet, Text, TextInput, View } from 'react-native';
-// Componentes básicos de la interfaz en React Native
-
-import { TaskContext } from '../context/TaskContext';
-// Importa el contexto de tareas
+import {
+  Alert,
+  Button,
+  StyleSheet,
+  Text, TextInput,
+  View
+} from 'react-native';
+import { Category, TaskContext } from '../context/TaskContext';
 
 export default function AddTaskScreen() {
-  const { addTask } = useContext(TaskContext); // Accede a la función para agregar tarea
-  const router = useRouter(); // Para regresar a la pantalla anterior
+  const { addTask } = useContext(TaskContext);
+  const router = useRouter();
 
-  const [title, setTitle] = useState(''); // Estado para el título
-  const [description, setDescription] = useState(''); // Estado para la descripción
+  const [title, setTitle]         = useState('');
+  const [description, setDescription] = useState('');
+  const [category, setCategory]   = useState<Category>('Universidad');
+  const [dueDate, setDueDate]     = useState(''); // YYYY-MM-DD
+  const [dueTime, setDueTime]     = useState(''); // HH:MM
 
-  // Función que se ejecuta al guardar
   const onSave = () => {
-    if (!title.trim()) return Alert.alert('Error','El título es obligatorio');
-    // Agrega la nueva tarea al contexto
-    addTask({ title: title.trim(), description: description.trim(), completed: false });
-    router.back(); // Vuelve a la pantalla anterior
+    if (!title.trim()) {
+      return Alert.alert('Error', 'El título es obligatorio');
+    }
+    if (!dueDate.trim() || !dueTime.trim()) {
+      return Alert.alert('Error', 'Debes asignar fecha y hora de vencimiento');
+    }
+    addTask({
+      title: title.trim(),
+      description: description.trim(),
+      completed: false,
+      category,
+      dueDate,
+      dueTime
+    });
+    router.back();
   };
 
   return (
     <View style={styles.container}>
-      {/* Campo para el título */}
       <Text style={styles.label}>Título:</Text>
       <TextInput
+        style={styles.input}
+        placeholder="Título"
         value={title}
         onChangeText={setTitle}
-        style={styles.input}
-        placeholder="Escribe un título"
       />
 
-      {/* Campo para la descripción */}
       <Text style={styles.label}>Descripción:</Text>
       <TextInput
+        style={[styles.input, styles.textarea]}
+        placeholder="Descripción (opcional)"
         value={description}
         onChangeText={setDescription}
-        style={[styles.input, styles.textarea]}
-        placeholder="Detalles de la tarea"
         multiline
       />
 
-      {/* Botón para guardar tarea */}
+      <Text style={styles.label}>Categoría:</Text>
+      <Picker
+        selectedValue={category}
+        onValueChange={val => setCategory(val as Category)}
+        style={styles.picker}
+      >
+        <Picker.Item label="Universidad" value="Universidad" />
+        <Picker.Item label="Trabajo"     value="Trabajo" />
+        <Picker.Item label="Hogar"       value="Hogar" />
+      </Picker>
+
+      <Text style={styles.label}>Fecha de vencimiento (YYYY-MM-DD):</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="2025-12-31"
+        value={dueDate}
+        onChangeText={setDueDate}
+      />
+
+      <Text style={styles.label}>Hora de vencimiento (HH:MM):</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="14:30"
+        value={dueTime}
+        onChangeText={setDueTime}
+      />
+
       <Button title="Guardar tarea" onPress={onSave} />
     </View>
   );
 }
 
-// Estilos para los componentes
 const styles = StyleSheet.create({
-  container: { flex:1, padding:16 },
-  label: { marginBottom:4, fontWeight:'bold' },
-  input: {
-    borderWidth:1, borderColor:'#ccc',
-    padding:8, marginBottom:16, borderRadius:4
+  container:  { flex:1, padding:16 },
+  label:      { fontWeight:'bold', marginTop:12 },
+  input:      {
+    borderWidth:1,
+    borderColor:'#ccc',
+    padding:8,
+    marginTop:4,
+    borderRadius:4
   },
-  textarea: { height:80, textAlignVertical:'top' },
+  textarea:   { height:80, textAlignVertical:'top' },
+  picker:     { marginTop:4 }
 });
-
